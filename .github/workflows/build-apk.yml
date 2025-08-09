@@ -15,7 +15,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt update
-        sudo apt install -y python3-pip openjdk-17-jdk unzip git libffi-dev libssl-dev
+        sudo apt install -y python3-pip openjdk-17-jdk unzip git libffi-dev libssl-dev sed
         pip install --upgrade pip
         pip install --user buildozer cython
         echo "$HOME/.local/bin" >> $GITHUB_PATH
