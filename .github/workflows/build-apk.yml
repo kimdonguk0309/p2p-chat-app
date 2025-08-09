@@ -38,7 +38,16 @@ jobs:
         PATH: $HOME/android-sdk/platform-tools:$HOME/android-sdk/cmdline-tools/latest/bin:$HOME/.local/bin:$PATH
       run: |
         buildozer init
-        sed -i 's/^requirements =.*/requirements = kivy,cryptography/' buildozer.spec
+        python3 -c "
+with open('buildozer.spec', 'r') as f:
+    lines = f.readlines()
+with open('buildozer.spec', 'w') as f:
+    for line in lines:
+        if line.startswith('requirements ='):
+            f.write('requirements = kivy,cryptography\n')
+        else:
+            f.write(line)
+"
         buildozer -v android debug
 
     - name: Upload APK
