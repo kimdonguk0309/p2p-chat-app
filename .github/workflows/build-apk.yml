@@ -19,25 +19,21 @@ jobs:
         pip install --upgrade pip
         pip install buildozer cython
 
-    - name: Install Android SDK + Accept Licenses
-      run: |
-        mkdir -p $HOME/android-sdk
-        cd $HOME/android-sdk
-        wget https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip -O cmdtools.zip
-        unzip cmdtools.zip -d cmdline-tools
-        mkdir -p cmdline-tools/latest
-        mv cmdline-tools/cmdline-tools/* cmdline-tools/latest/
-        yes | cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/android-sdk --licenses
-        yes | cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/android-sdk "platform-tools" "platforms;android-33" "build-tools;36.0.0"
-
-    - name: Build APK
-      env:
-        ANDROIDSDK: $HOME/android-sdk
-        ANDROIDNDK: $HOME/.buildozer/android/platform/android-ndk-r25b
+    - name: Prepare Buildozer and SDK licenses
       run: |
         buildozer init
         sed -i 's/^requirements =.*/requirements = kivy,cryptography/' buildozer.spec
-        export PATH=$ANDROIDSDK/platform-tools:$PATH
+        # Buildozer가 SDK 설치하도록 한 번 실행
+        buildozer android debug || true
+        # 라이선스 동의
+        yes | $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager \
+            --sdk_root=$HOME/.buildozer/android/platform/android-sdk --licenses
+        # 필요한 빌드툴 설치
+        yes | $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager \
+            --sdk_root=$HOME/.buildozer/android/platform/android-sdk "build-tools;36.0.0"
+
+    - name: Build APK (final)
+      run: |
         buildozer -v android debug
 
     - name: Upload APK
