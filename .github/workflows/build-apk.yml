@@ -10,12 +10,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout source code
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
     - name: Build APK inside Docker container
       run: |
-        docker run --rm -v ${{ github.workspace }}:/app -w /app mitmproxy/buildozer /bin/bash -c "
+        docker run --rm -v ${{ github.workspace }}:/app -w /app kivy/buildozer:latest /bin/bash -c "
           buildozer init && \
           sed -i 's/^requirements =.*/requirements = kivy,cryptography/' buildozer.spec && \
           buildozer android debug
